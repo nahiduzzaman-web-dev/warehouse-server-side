@@ -40,6 +40,14 @@ async function run() {
             const result = await medicineCollection.insertOne(newMedicine);
             res.send(result);
         });
+
+        // delete
+        app.delete('/medicine/:id', async (req, res) => {
+            const id = req.params.id;
+            const query = { _id: ObjectId(id) };
+            const result = await medicineCollection.deleteOne(query);
+            res.send(result);
+        })
     }
     finally {
 
