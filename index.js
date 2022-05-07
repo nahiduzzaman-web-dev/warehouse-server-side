@@ -1,4 +1,5 @@
 const express = require('express');
+const jwt = require('jsonwebtoken');
 const cors = require('cors');
 require('dotenv').config();
 const app = express();
@@ -72,6 +73,21 @@ async function run() {
             })
 
             res.send(medicine);
+        })
+
+        // My Item
+        app.get("/myitems", async (req, res) => {
+            const token = req.headers.token;
+            const { email } = jwt.verify(token, process.env.JWT_TOKEN);
+            const query = { email };
+            const cursor = medicineCollection.find(query);
+            const medicines = await cursor.toArray();
+            res.send(medicines);
+        })
+
+        app.post("/login", async (req, res) => {
+            const token = jwt.sign(req.body, process.env.JWT_TOKEN);
+            res.send({ token });
         })
     }
     finally {
