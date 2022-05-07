@@ -47,6 +47,21 @@ async function run() {
             const query = { _id: ObjectId(id) };
             const result = await medicineCollection.deleteOne(query);
             res.send(result);
+        });
+
+        // update quantity
+        app.put('/medicine/:id', async (req, res) => {
+            const id = req.params.id;
+            const updateQuantity = req.body;
+            const filter = { _id: ObjectId(id) };
+            const options = { upsert: true };
+            const updateDocument = {
+                $set: {
+                    quantity: updateQuantity.quantity
+                }
+            };
+            const result = await medicineCollection.updateOne(filter, updateDocument, options);
+            res.send(result);
         })
     }
     finally {
