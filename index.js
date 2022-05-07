@@ -37,6 +37,7 @@ async function run() {
         // post (send data to server)
         app.post('/medicine', async (req, res) => {
             const newMedicine = req.body;
+            newMedicine.quantity = parseInt(newMedicine.quantity);
             const result = await medicineCollection.insertOne(newMedicine);
             res.send(result);
         });
@@ -50,18 +51,27 @@ async function run() {
         });
 
         // update quantity
-        app.put('/medicine/:id', async (req, res) => {
+        app.put('/medicine/increase/:id', async (req, res) => {
             const id = req.params.id;
-            const updateQuantity = req.body;
-            const filter = { _id: ObjectId(id) };
-            const options = { upsert: true };
-            const updateDocument = {
-                $set: {
-                    quantity: updateQuantity.quantity
-                }
-            };
-            const result = await medicineCollection.updateOne(filter, updateDocument, options);
-            res.send(result);
+            const quantity = parseInt(req.body.quantity);
+            const query = { _id: ObjectId(id) };
+            const medicine = await medicineCollection.findOne(query);
+
+            const newQuantity = quantity + medicine.quantity;
+            const updateMedicine = await medicineCollection.updateOne(query, {
+                $set: { quantity: newQuantity },
+            });
+
+            res.send(updateMedicine);
+        })
+        app.put('/medicine/decrease/:id', async (req, res) => {
+            const id = req.params.id;
+            const query = { _id: ObjectId(id) };
+            const medicine = await medicineCollection.updateOne(query, {
+                $inc: { quantity: -1 },
+            })
+
+            res.send(medicine);
         })
     }
     finally {
