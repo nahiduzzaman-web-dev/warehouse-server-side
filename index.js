@@ -65,6 +65,7 @@ async function run() {
 
             res.send(updateMedicine);
         })
+        // decrease 
         app.put('/medicine/decrease/:id', async (req, res) => {
             const id = req.params.id;
             const query = { _id: ObjectId(id) };
